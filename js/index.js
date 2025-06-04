@@ -1,10 +1,25 @@
 const canvas = document.querySelector('canvas')
 const c = canvas.getContext('2d')
 const dpr = window.devicePixelRatio || 1
+const MAP_SCALE=dpr + 3
+const MAP_COLS=28
+const MAP_ROWS=28
+const TILE_SIZE=16
 
 canvas.width = 1024 * dpr
 canvas.height = 576 * dpr
 
+const VIEWPORT_WIDTH=canvas.width/MAP_SCALE
+const VIEWPORT_HEIGHT=canvas.height/MAP_SCALE
+
+const VIEWPORT_CENTER_X=VIEWPORT_WIDTH/2
+const VIEWPORT_CENTER_Y=VIEWPORT_HEIGHT/2
+
+const MAP_WIDTH=TILE_SIZE*MAP_COLS
+const MAP_HEIGHT=TILE_SIZE*MAP_ROWS
+
+const MAP_SCROLL_X=MAP_WIDTH-VIEWPORT_WIDTH
+const MAP_SCROLL_Y=MAP_HEIGHT-VIEWPORT_HEIGHT
 const layersData = {
    l_Terrain: l_Terrain,
    l_Front_Renders: l_Front_Renders,
@@ -148,9 +163,12 @@ function animate(backgroundCanvas) {
   player.handleInput(keys)
   player.update(deltaTime, collisionBlocks)
 
+  const horizontalScrollDistance =Math.min(Math.max(0,player.center.x - VIEWPORT_CENTER_X),MAP_SCROLL_X)
+  const verticalScrollDistance=Math.min(Math.max(0,player.center.y - VIEWPORT_CENTER_Y),MAP_SCROLL_Y)
   // Render scene
   c.save()
-  c.scale(dpr, dpr)
+  c.scale(MAP_SCALE,MAP_SCALE )
+  c.translate(-horizontalScrollDistance,-verticalScrollDistance)
   c.clearRect(0, 0, canvas.width, canvas.height)
   c.drawImage(backgroundCanvas, 0, 0)
   player.draw(c)
